@@ -1,11 +1,12 @@
 package game2048;
 
 import java.util.Formatter;
+import java.util.Iterator;
 import java.util.Observable;
 
 
 /** The state of a game of 2048.
- *  @author TODO: YOUR NAME HERE
+ *  @author kamen
  */
 public class Model extends Observable {
     /** Current contents of the board. */
@@ -138,6 +139,10 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        for (Tile tile : b) {
+            if (tile == null)
+                return true;
+        }
         return false;
     }
 
@@ -148,6 +153,10 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        for (Tile tile : b) {
+            if (tile != null && tile.value() == MAX_PIECE)
+                return true;
+        }
         return false;
     }
 
@@ -159,6 +168,23 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        if(emptySpaceExists(b))
+            return true;
+        else {
+            int len = b.size();
+            for(Tile tile : b) {
+                for(Tile next : b) {
+                    if(next == tile || next.value() != tile.value())
+                        continue;
+                    if((next.row() == tile.row()+1 && next.col() == tile.col())||
+                            (next.row() == tile.row()-1 && next.col() == tile.col()))
+                        return true;
+                    if((next.col() == tile.col()+1 && next.row() == tile.row())||
+                            (next.col() == tile.col()-1 && next.row() == tile.row()))
+                        return true;
+                }
+            }
+        }
         return false;
     }
 
