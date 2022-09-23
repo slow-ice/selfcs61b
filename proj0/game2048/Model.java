@@ -115,6 +115,13 @@ public class Model extends Observable {
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
 
+        board.setViewingPerspective(side);
+
+        if(getcols())
+            changed = true;
+
+        board.setViewingPerspective(Side.NORTH);
+
         checkGameOver();
         if (changed) {
             setChanged();
@@ -226,4 +233,56 @@ public class Model extends Observable {
     public int hashCode() {
         return toString().hashCode();
     }
+
+    public boolean getcols() {
+        boolean hasmoved = false;
+        for(int j = 0; j < 4; j++) {
+            int maxheight = 3;
+            boolean hasmerged = false;
+            int maxmergeheight = 3;
+            for(int i = 2; i >= 0; i--) {
+                Tile now = this.board.tile(j, i);
+                if(now == null)
+                    continue;
+
+                for(int h = maxmergeheight; h > i; h--) {
+                    maxheight = h;
+                    if(h != 3 && this.board.tile(j, h) == null) {
+                        maxheight++;
+                        break;
+                    }
+                }
+                if(maxheight < maxmergeheight)
+                    hasmerged = false;
+                Tile toptile = this.board.tile(j, maxheight);
+
+                if(toptile == null) {
+                    this.board.move(j, maxheight, now);
+                    hasmoved = true;
+                    continue;
+                }
+
+                if(now.value() != toptile.value()) {
+                    if(maxheight == 1)
+                        break;
+                    this.board.move(j, maxheight-1, now);
+                    hasmoved = true;
+                }
+                else if(!hasmerged && this.board.move(j, maxheight, now)) {
+                    hasmerged = true;
+                    hasmoved = true;
+                    this.score += this.board.tile(j, maxheight).value();
+                    maxmergeheight = maxheight;
+                }
+                else if(hasmerged) {
+                    hasmoved = true;
+                    if(maxheight == 1)
+                        break;
+                    this.board.move(j, maxheight-1, now);
+                }
+            }
+        }
+        return hasmoved;
+    }
+
 }
